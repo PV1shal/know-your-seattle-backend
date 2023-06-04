@@ -18,7 +18,9 @@ export default class BlocksController {
 
             const locations = data.map(item => ({
                 lat: parseFloat(item.latitude),
-                long: parseFloat(item.longitude)
+                long: parseFloat(item.longitude),
+                code: item.offense_code,
+                offense: item.offense,
             }));
 
             const clusters = createClusters(locations, 2);
@@ -42,7 +44,8 @@ function createClusters(locations, maxDistance) {
         const currentLocation = locations[i];
         const cluster = {
             centroid: [currentLocation.lat, currentLocation.long],
-            radius: 0
+            code: currentLocation.code,
+            offense: currentLocation.offense,
         };
         const clusterLocations = [currentLocation];
         visited.add(i);
@@ -53,7 +56,10 @@ function createClusters(locations, maxDistance) {
             const nextLocation = locations[j];
             const distance = calculateDistance(currentLocation, nextLocation);
 
-            if (distance <= maxDistance) {
+            if (
+                distance <= maxDistance &&
+                currentLocation.code === nextLocation.code
+            ) {
                 clusterLocations.push(nextLocation);
                 visited.add(j);
             }
